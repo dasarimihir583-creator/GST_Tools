@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Value of Supply Logic Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-brand-600 p-6 text-white">
+            <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                GST Value of Supply Engine
+            </h1>
+            <p class="text-brand-100 mt-2 text-sm md:text-base">Determine the taxable value of goods and services as per Section 15 and Chapter IV Valuation Rules.</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Step 1: Main Logic Selector -->
+            <div class="mb-8 p-5 bg-brand-50 rounded-lg border border-brand-100">
+                <label class="block text-sm font-semibold text-brand-900 mb-2">1. Select the Nature of Transaction</label>
+                <select id="mainMode" onchange="toggleSections()" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-brand-500 focus:border-brand-500 bg-white">
+                    <option value="standard">Standard Supply (Unrelated parties & price is sole consideration) - Sec 15(1)</option>
+                    <option value="rule32_air">Air Travel Agent Service - Rule 32(3)</option>
+                    <option value="rule32_life">Life Insurance Service - Rule 32(4)</option>
+                    <option value="rule32_secondhand">Second Hand Goods (Margin Scheme) - Rule 32(5)</option>
+                    <option value="rule32_voucher">Vouchers, Tokens, Coupons - Rule 32(6)</option>
+                    <option value="rule27">Consideration not wholly in money - Rule 27</option>
+                </select>
+            </div>
+
+            <!-- Standard Section 15 Logic -->
+            <div id="standardSection" class="logic-section transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Transaction Value [Section 15]</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Base Price (Paid or Payable)</label>
+                        <input type="number" id="basePrice" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Taxes/Duties (Other than GST)</label>
+                        <input type="number" id="otherTaxes" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Excl. CGST, SGST, IGST, UTGST, Cess. TCS under IT Act is also excluded.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Third Party Payments</label>
+                        <input type="number" id="thirdParty" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Incurred by recipient on behalf of supplier.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Incidental Expenses</label>
+                        <input type="number" id="incidental" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Packing, commission, testing, outward freight (if arranged by supplier).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Interest / Late Fee / Penalty</label>
+                        <input type="number" id="interest" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">For delayed payment of consideration.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Non-Govt Subsidies</label>
+                        <input type="number" id="subsidy" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Directly linked to price (Exclude Central/State Govt subsidies).</p>
+                    </div>
+
+                    <div class="md:col-span-2 bg-green-50 p-4 border border-green-200 rounded-md">
+                        <label class="block text-sm font-medium text-green-800">Less: Permissible Discounts [Sec 15(3)]</label>
+                        <input type="number" id="discount" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-green-700 mt-1">Given before/at time of supply and recorded in invoice, OR post-supply if pre-agreed and ITC reversed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specific Rules Sections -->
+            
+            <!-- Rule 32(3) Air Travel -->
+            <div id="rule32_airSection" class="logic-section hidden transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Air Travel Agent Service [Rule 32(3)]</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Type of Booking</label>
+                        <select id="airType" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                            <option value="domestic">Domestic Travel (5% of Basic Fare)</option>
+                            <option value="international">International Travel (10% of Basic Fare)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Basic Fare (₹)</label>
+                        <input type="number" id="airBasicFare" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Fare on which commission is normally paid by airlines.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 32(4) Life Insurance -->
+            <div id="rule32_lifeSection" class="logic-section hidden transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Life Insurance Business [Rule 32(4)]</h2>
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Policy Type</label>
+                        <select id="lifeType" onchange="toggleLifeInputs()" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                            <option value="dual">Dual Benefit (Risk + Investment intimated to policy holder)</option>
+                            <option value="annuity">Single Premium Annuity Policy</option>
+                            <option value="other_first">Other Policy - 1st Year Premium</option>
+                            <option value="other_sub">Other Policy - Subsequent Years Premium</option>
+                            <option value="risk">Policy ONLY towards Risk Cover</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Gross Premium Charged (₹)</label>
+                            <input type="number" id="lifePremium" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div id="lifeInvestmentDiv">
+                            <label class="block text-sm font-medium text-gray-700">Amount allocated for Investment/Savings (₹)</label>
+                            <input type="number" id="lifeInvestment" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 32(5) Second Hand Goods -->
+            <div id="rule32_secondhandSection" class="logic-section hidden transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Second Hand Goods (Margin Scheme) [Rule 32(5)]</h2>
+                <p class="text-sm text-gray-600 mb-4 bg-yellow-50 p-3 border-l-4 border-yellow-400">Applicable only when no ITC has been availed on the purchase of such goods. Negative margin is ignored (Value = Nil).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Selling Price (₹)</label>
+                        <input type="number" id="shSelling" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Purchase Price (₹)</label>
+                        <input type="number" id="shPurchase" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 32(6) Vouchers -->
+            <div id="rule32_voucherSection" class="logic-section hidden transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Vouchers, Tokens, Coupons [Rule 32(6)]</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Money value of redeemable goods/services (₹)</label>
+                        <input type="number" id="voucherValue" value="0" min="0" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                        <p class="text-xs text-gray-500 mt-1">Value is NOT the price the coupon was sold for, but its redeemable worth.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 27 Consideration not wholly in money -->
+            <div id="rule27Section" class="logic-section hidden transition-all duration-300">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4">Consideration Not Wholly in Money [Rule 27]</h2>
+                <p class="text-sm text-gray-600 mb-4">Methods are applied in sequential order. Use the first available value.</p>
+                <div class="grid grid-cols-1 gap-4 bg-gray-50 p-4 border rounded-md">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">1. Open Market Value (OMV) (₹)</label>
+                        <input type="number" id="r27Omv" value="0" min="0" class="mt-1 w-full md:w-1/2 p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">2. If OMV not available: Monetary Consideration + Money value of non-monetary consideration (₹)</label>
+                        <input type="number" id="r27Combined" value="0" min="0" class="mt-1 w-full md:w-1/2 p-2 border border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculation Action -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <button onclick="calculateValue()" class="w-full md:w-auto px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow transition duration-200">
+                    Calculate Taxable Value
+                </button>
+            </div>
+
+            <!-- Result Area -->
+            <div id="resultArea" class="mt-6 hidden">
+                <div class="bg-gradient-to-r from-brand-50 to-white border-l-4 border-brand-500 p-6 rounded-r-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-700">Calculated Value of Supply</h3>
+                    <div class="mt-2 text-4xl font-bold text-brand-700">₹ <span id="finalValue">0.00</span></div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Applied Logic / Legal Provision</h4>
+                        <p id="logicExplanation" class="mt-1 text-sm text-gray-600 italic leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // UI Logic to show/hide sections
+        function toggleSections() {
+            // Hide all sections first
+            document.querySelectorAll('.logic-section').forEach(el => el.classList.add('hidden'));
+            
+            // Show the selected section
+            const mode = document.getElementById('mainMode').value;
+            document.getElementById(mode + 'Section').classList.remove('hidden');
+
+            // Hide result area when changing modes
+            document.getElementById('resultArea').classList.add('hidden');
+        }
+
+        // Specific toggle for Life Insurance inputs
+        function toggleLifeInputs() {
+            const type = document.getElementById('lifeType').value;
+            const investDiv = document.getElementById('lifeInvestmentDiv');
+            if(type === 'dual') {
+                investDiv.style.display = 'block';
+            } else {
+                investDiv.style.display = 'none';
+            }
+        }
+
+        // Helper to get number from input safely
+        function getNum(id) {
+            const val = parseFloat(document.getElementById(id).value);
+            return isNaN(val) ? 0 : val;
+        }
+
+        // Core Engine Calculation
+        function calculateValue() {
+            const mode = document.getElementById('mainMode').value;
+            let value = 0;
+            let logicText = "";
+
+            switch (mode) {
+                case 'standard':
+                    const base = getNum('basePrice');
+                    const taxes = getNum('otherTaxes');
+                    const thirdParty = getNum('thirdParty');
+                    const incidental = getNum('incidental');
+                    const interest = getNum('interest');
+                    const subsidy = getNum('subsidy');
+                    const discount = getNum('discount');
+                    
+                    value = base + taxes + thirdParty + incidental + interest + subsidy - discount;
+                    
+                    logicText = "<strong>Section 15(1) & (2):</strong> Value is the Transaction Value. <br>" +
+                                "Added inclusions: Taxes (" + taxes + "), Third Party Payments (" + thirdParty + "), Incidental Expenses (" + incidental + "), Interest (" + interest + "), Subsidies (" + subsidy + "). <br>" +
+                                "Deducted exclusions: Discount (" + discount + ") under Section 15(3).";
+                    break;
+
+                case 'rule32_air':
+                    const airType = document.getElementById('airType').value;
+                    const basicFare = getNum('airBasicFare');
+                    
+                    if(airType === 'domestic') {
+                        value = basicFare * 0.05;
+                        logicText = "<strong>Rule 32(3):</strong> For domestic air travel, value is deemed to be 5% of the basic fare.";
+                    } else {
+                        value = basicFare * 0.10;
+                        logicText = "<strong>Rule 32(3):</strong> For international air travel, value is deemed to be 10% of the basic fare.";
+                    }
+                    break;
+
+                case 'rule32_life':
+                    const lifeType = document.getElementById('lifeType').value;
+                    const premium = getNum('lifePremium');
+                    
+                    if (lifeType === 'dual') {
+                        const investment = getNum('lifeInvestment');
+                        value = Math.max(0, premium - investment);
+                        logicText = "<strong>Rule 32(4)(a):</strong> Gross premium reduced by the amount allocated for investment/savings (as intimated to policyholder).";
+                    } else if (lifeType === 'annuity') {
+                        value = premium * 0.10;
+                        logicText = "<strong>Rule 32(4)(b):</strong> 10% of single premium charged for single premium annuity policies.";
+                    } else if (lifeType === 'other_first') {
+                        value = premium * 0.25;
+                        logicText = "<strong>Rule 32(4)(c):</strong> 25% of the premium charged in the first year.";
+                    } else if (lifeType === 'other_sub') {
+                        value = premium * 0.125;
+                        logicText = "<strong>Rule 32(4)(c):</strong> 12.5% of the premium charged in subsequent years.";
+                    } else if (lifeType === 'risk') {
+                        value = premium;
+                        logicText = "<strong>Rule 32(4) Proviso:</strong> If entire premium is only towards risk cover, the entire premium is the taxable value.";
+                    }
+                    break;
+
+                case 'rule32_secondhand':
+                    const sp = getNum('shSelling');
+                    const pp = getNum('shPurchase');
+                    value = sp - pp;
+                    
+                    if (value < 0) {
+                        value = 0;
+                        logicText = "<strong>Rule 32(5):</strong> Margin is negative. Negative value is ignored; Taxable value is NIL.";
+                    } else {
+                        logicText = "<strong>Rule 32(5):</strong> Value is the difference between Selling Price and Purchase Price (Margin Scheme) since no ITC was availed.";
+                    }
+                    break;
+
+                case 'rule32_voucher':
+                    value = getNum('voucherValue');
+                    logicText = "<strong>Rule 32(6):</strong> Value of a voucher/token/coupon is equal to the money value of the goods or services redeemable against it.";
+                    break;
+
+                case 'rule27':
+                    const omv = getNum('r27Omv');
+                    const combined = getNum('r27Combined');
+                    
+                    if (omv > 0) {
+                        value = omv;
+                        logicText = "<strong>Rule 27(a):</strong> Value is the Open Market Value (OMV) of the supply.";
+                    } else {
+                        value = combined;
+                        logicText = "<strong>Rule 27(b):</strong> Since OMV is not available, value is the sum of consideration in money and the money equivalent of the non-monetary consideration.";
+                    }
+                    break;
+            }
+
+            // Ensure value doesn't go below 0 (unless specific accounting needs it, but generally for GST value is >= 0)
+            if(value < 0 && mode !== 'standard') value = 0; 
+
+            // Display Results
+            document.getElementById('finalValue').innerText = value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('logicExplanation').innerHTML = logicText;
+            document.getElementById('resultArea').classList.remove('hidden');
+        }
+
+        // Initialize state on load
+        window.onload = function() {
+            toggleSections();
+        };
+    </script>
+</body>
+</html>
